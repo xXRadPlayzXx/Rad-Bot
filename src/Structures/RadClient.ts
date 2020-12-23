@@ -31,9 +31,9 @@ class RadClient extends Client {
   public async start(config: clientConfig): Promise<void> {
     this.config = config;
     this.login(config.token);
-    const commandFiles = readdirSync(
-      path.normalize(`../${config.commandsDir}`)
-    ).filter((f) => f.endsWith(".ts"));
+    const commandFiles = readdirSync(`../${config.commandsDir}/`).filter((f) =>
+      f.endsWith(".ts")
+    );
     commandFiles.forEach(async (commandFile: any) => {
       const fileName = commandFile.split(".")[0];
       commandFile = await import(`../${config.commandsDir}/${fileName}`);
