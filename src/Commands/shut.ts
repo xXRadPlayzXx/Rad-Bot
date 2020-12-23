@@ -1,9 +1,9 @@
 export = {
   name: "shutdown",
   ownerOnly: true,
-  category: 'Dev',
-  description: 'Shuts down the bot'
+  category: "Dev",
+  description: "Shuts down the bot",
   callback: (message, args, bot) => {
-    bot.destroy();
+    process.exit();
   },
 };
