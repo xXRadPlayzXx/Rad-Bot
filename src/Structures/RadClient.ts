@@ -27,7 +27,7 @@ class RadClient extends Client {
     super(options);
     self = this;
   }
-  
+
   public async start(config: clientConfig): Promise<void> {
     this.config = config;
     this.login(config.token);
@@ -36,7 +36,7 @@ class RadClient extends Client {
     );
     commandFiles.forEach(async (commandFile: any) => {
       const fileName = commandFile.split(".")[0];
-      commandFile = await import(`../${config.commandsDir}/${fileName}`);
+      commandFile = await import(`${__dirname}/Commands/${fileName}`);
       commandFile = commandFile.default;
       const missing: string[] = [];
       let callbackCounter: number = 0;
@@ -146,10 +146,7 @@ class RadClient extends Client {
         `Command Handler > Loaded ${this.commands.size} Commands, ${this.aliases.size} Aliases.`
       );
     });
-    const eventFiles = readdirSync(
-      path.join(__dirname, "..", config.eventsDir)
-    ).filter((f) => f.endsWith(".ts"));
-    eventFiles.forEach(async (eventFile) => {});
+    
   }
 
   public getColor(message: Message): ColorResolvable {
