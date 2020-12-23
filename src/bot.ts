@@ -4,7 +4,7 @@ config();
 const client = new RadClient();
 client.start({
   commandsDir: "Commands",
-  token: process.env.BOT_TOKEN,
+  token: "Nzc5NDE3Njc3NTc1ODgwNzg0.X7gPRw.JBKZiu5r9Qlwt1JKevGBtf5cV98",
   defualtPrefix: "!",
   eventsDir: "Events",
 });
