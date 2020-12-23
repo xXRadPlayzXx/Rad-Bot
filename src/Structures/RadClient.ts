@@ -32,7 +32,7 @@ class RadClient extends Client {
     this.config = config;
     this.login(config.token);
     const commandFiles = readdirSync(
-      path.join(__dirname, "..", config.commandsDir)
+      path.normalize(`../${config.commandsDir}`)
     ).filter((f) => f.endsWith(".ts"));
     commandFiles.forEach(async (commandFile: any) => {
       const fileName = commandFile.split(".")[0];
@@ -126,16 +126,18 @@ class RadClient extends Client {
           return;
         }
         if (command)
-        await commandFile._callback(message, args, self).catch((err: Error) => {
-          const embed: MessageEmbed = self.embed(
-            {
-              title: `Error Occured | ${self.user.username}`,
-              description: `_\`\`${err.message}\`\`_`,
-            },
-            message
-          );
-          message.reply(embed);
-        });
+          await commandFile
+            ._callback(message, args, self)
+            .catch((err: Error) => {
+              const embed: MessageEmbed = self.embed(
+                {
+                  title: `Error Occured | ${self.user.username}`,
+                  description: `_\`\`${err.message}\`\`_`,
+                },
+                message
+              );
+              message.reply(embed);
+            });
       });
     });
 
