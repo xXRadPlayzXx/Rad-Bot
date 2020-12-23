@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import RadClient from "../Structures/RadClient";
+import RadClient from "../RadClient";
 import ms from "ms";
 export = {
   name: 'ping',

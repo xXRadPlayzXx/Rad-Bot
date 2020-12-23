@@ -1,5 +1,5 @@
 import { Presence } from "discord.js";
-import RadClient from "../Structures/RadClient";
+import RadClient from "../RadClient";
 
 export = {
   name: "shutdown",

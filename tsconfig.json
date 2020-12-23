@@ -15,7 +15,7 @@
     },
     "include": [
       "src/**/*.ts"
-, "src/commands/ping.js"    ],
+, "src/Structures/Commands/ping.js"    ],
     "exclude": [
       "src/**/*.spec.ts",
       "node_modules"

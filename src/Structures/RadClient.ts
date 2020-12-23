@@ -27,11 +27,11 @@ class RadClient extends Client {
     super(options);
     self = this;
   }
-
+  
   public async start(config: clientConfig): Promise<void> {
     this.config = config;
     this.login(config.token);
-    const commandFiles = readdirSync(`../${config.commandsDir}`).filter((f) =>
+    const commandFiles = readdirSync(`${__dirname}/Commands`).filter((f) =>
       f.endsWith(".ts")
     );
     commandFiles.forEach(async (commandFile: any) => {
