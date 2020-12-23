@@ -125,6 +125,7 @@ class RadClient extends Client {
           );
           return;
         }
+        if (command)
         await commandFile._callback(message, args, self).catch((err: Error) => {
           const embed: MessageEmbed = self.embed(
             {

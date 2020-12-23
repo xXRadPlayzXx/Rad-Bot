@@ -1,5 +1,6 @@
+import { Message, StringResolvable } from "discord.js";
 import RadClient from "../Structures/RadClient";
 
 export interface cmdRunFn {
-  (bot: RadClient, ...args: any[]): Promise<void>;
+  (message: Message, args: string[], bot: RadClient): Promise<void>;
 }
