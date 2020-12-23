@@ -1,0 +1,22 @@
+{
+  "name": "rad-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.ts",
+  "scripts": {
+    "start": "cls && nodemon src/bot.ts",
+    "git": "cls && git add * && git commit -m \"Improvments\" && git push -u origin main && cls "
+  },
+  "author": "RadPlayz",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^14.14.14",
+    "chalk": "^4.1.0",
+    "colors": "^1.4.0",
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "glob": "^7.1.6",
+    "ms": "^2.1.3",
+    "readdir-plus": "^1.1.1"
+  }
+}
