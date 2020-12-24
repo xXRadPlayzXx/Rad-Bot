@@ -1,11 +1,12 @@
 import { Message } from "discord.js";
-import RadClient from "../RadClient";
+import RadClient from "../Structures/RadClient";
 import ms from "ms";
 export = {
-  name: 'ping',
-  aliases: ['latency','uptime','botuptime','raduptime'],
-  description: 'Ping => Pong',
-  category: 'Info',
+  name: "ping",
+  aliases: ["latency", "uptime", "botuptime", "raduptime"],
+  description: "Ping => Pong",
+  category: "Info",
+  reqPerms: ["MANAGE_MESSAGES"],
   callback: async (message: Message, args: string[], bot: RadClient) => {
     const msg = await message.reply(
       bot.embed(

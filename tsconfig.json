@@ -1,23 +1,18 @@
 {
-    "compilerOptions": {
-      "target": "es6",
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "noImplicitAny": false,
-      "removeComments": true,
-      "preserveConstEnums": true,
-      "sourceMap": true,
-      "forceConsistentCasingInFileNames": true,
-      "outDir": "dist",
-      "declaration": true,
-      "esModuleInterop": true,
-      "resolveJsonModule": true
-    },
-    "include": [
-      "src/**/*.ts"
-, "src/Structures/Commands/ping.js"    ],
-    "exclude": [
-      "src/**/*.spec.ts",
-      "node_modules"
-    ]
-  }
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist",
+    "declaration": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts", "src/Commands/ping.js"],
+  "exclude": ["src/**/*.spec.ts", "node_modules"]
+}

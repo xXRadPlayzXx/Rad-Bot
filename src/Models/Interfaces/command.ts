@@ -1,5 +1,5 @@
 import { PermissionResolvable } from "discord.js";
-import { cmdRunFn } from "../cmdRunFn";
+import { cmdRunFn } from "../Functions/cmdRunFn";
 
 type category = "Moderation" | "Dev" | "Economy" | "Fun";
 

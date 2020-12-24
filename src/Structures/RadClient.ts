@@ -7,36 +7,78 @@ import {
   ClientOptions,
   Collection,
   ColorResolvable,
+  GuildMember,
+  PermissionResolvable,
+  PermissionString,
 } from "discord.js";
-var self: RadClient;
+
+import path from "path";
+import Discord from "discord.js";
+import consola from "consola";
+import chalk from "chalk";
+
 import { clientConfig } from "../Models/Interfaces/clientConfig";
 import { Command } from "../Models/Interfaces/command";
 import { Event } from "../Models/Interfaces/event";
 import { version } from "../../package.json";
 import { readdirSync } from "fs";
-import path from "path";
+import { stringify } from "querystring";
+
+var self: RadClient;
+
 class RadClient extends Client {
   public embedColor: ColorResolvable;
   public commands: Collection<string, Command> = new Collection();
   public aliases: Collection<string, string> = new Collection();
   public events: Collection<string, Event> = new Collection();
-  public owners: Array<Snowflake>;
+  public owners: string[];
   public config: clientConfig;
+  public deleteCmdMessageOnTrigger: boolean;
 
   public constructor(options?: ClientOptions) {
     super(options);
     self = this;
   }
+  public colorText(
+    text: string,
+    subTitles?: string[] | string,
+    title: string = "Rad Bot"
+  ) {
+    var baseTitle = `${title} ${chalk.cyan("|")} `;
+    if (typeof subTitles === "string") {
+      subTitles = [subTitles];
+    }
+    if (subTitles) {
+      subTitles.forEach((subtitle: string, index: number) => {
+        baseTitle += `${chalk.blue(subtitle)} ${chalk.cyan("|")} `;
+      });
+    }
 
+    return `${baseTitle}${text}`;
+  }
+  public async isOwner(ids: string[], message: Message): Promise<boolean> {
+    let toReturn: boolean;
+    ids.forEach((id: string, index: number) => {
+      id = ids[index];
+      if (message.member.id !== id) {
+        toReturn = false;
+      } else {
+        toReturn = true;
+      }
+    });
+    return toReturn;
+  }
   public async start(config: clientConfig): Promise<void> {
     this.config = config;
     this.login(config.token);
-    const commandFiles = readdirSync(`${__dirname}/Commands`).filter((f) =>
-      f.endsWith(".ts")
-    );
+    const commandFiles = readdirSync(
+      path.join(__dirname, "..", config.commandsDir)
+    ).filter((f) => f.endsWith(".ts"));
     commandFiles.forEach(async (commandFile: any) => {
       const fileName = commandFile.split(".")[0];
-      commandFile = await import(`${__dirname}/Commands/${fileName}`);
+      commandFile = await import(
+        path.join(__dirname, "..", config.commandsDir, fileName)
+      );
       commandFile = commandFile.default;
       const missing: string[] = [];
       let callbackCounter: number = 0;
@@ -53,7 +95,7 @@ class RadClient extends Client {
         commandFile._callback = commandFile.execute;
       }
       if (callbackCounter > 1) {
-        console.warn(
+        return consola.warn(
           `Command Handler > Commands (${fileName}) can have run functions, But not multiple.`
         );
       }
@@ -61,12 +103,13 @@ class RadClient extends Client {
       if (!commandFile.category) missing.push("Category");
       if (!commandFile.description) missing.push("Description");
       if (missing.length) {
-        return console.warn(
+        return consola.warn(
           `Command Handler > Command ${fileName} is missing the proprties: ${missing.join(
             ", "
           )}`
         );
       }
+      self.aliases.set(fileName, commandFile.name);
       this.commands.set(commandFile.name, commandFile);
       if (typeof commandFile.aliases === "string")
         commandFile.aliases = [commandFile.aliases];
@@ -75,78 +118,17 @@ class RadClient extends Client {
           self.aliases.set(alias, commandFile.name);
         });
       }
-      this.on("message", async function (message) {
-        const mentionRegex = RegExp(`^<@!?${this.user.id}>$`);
-        const mentionRegexPrefix = RegExp(`^<@!?${this.user.id}>`);
-
-        if (message.author.bot) return;
-
-        if (message.content.match(mentionRegex))
-          return message.channel.send(
-            self.embed(
-              {
-                title: `Prefix | ${self.user.username}`,
-                description: `My prefix for **${message.guild.name}** Is **\`\`${config.defualtPrefix}\`\`**`,
-              },
-              message
-            )
-          );
-
-        const prefix = message.content.toLowerCase().match(mentionRegexPrefix)
-          ? message.content.match(mentionRegexPrefix)[0]
-          : config.defualtPrefix;
-
-        if (!message.content.toLowerCase().startsWith(prefix)) return;
-
-        const args = message.content.slice(prefix.length).trim().split(/ +/g);
-
-        const cmd = args.shift().toLowerCase();
-
-        const command: Command =
-          self.commands.get(cmd) || self.commands.get(self.aliases.get(cmd));
-        if (!command)
-          return message.reply(
-            self.embed(
-              {
-                description: `I cannot find the command **\`\`${cmd}\`\`**`,
-              },
-              message
-            )
-          );
-        if (!message.guild) {
-          message.react("❌");
-          message.channel.send(
-            self.embed(
-              {
-                description: `Commands can only be executed in a server.`,
-              },
-              message
-            )
-          );
-          return;
-        }
-        if (command)
-          await commandFile
-            ._callback(message, args, self)
-            .catch((err: Error) => {
-              const embed: MessageEmbed = self.embed(
-                {
-                  title: `Error Occured | ${self.user.username}`,
-                  description: `_\`\`${err.message}\`\`_`,
-                },
-                message
-              );
-              message.reply(embed);
-            });
-      });
     });
 
-    this.on("ready", () => {
-      console.log(
-        `Command Handler > Loaded ${this.commands.size} Commands, ${this.aliases.size} Aliases.`
-      );
+    const eventFiles = readdirSync(
+      path.join(__dirname, "..", config.eventsDir)
+    ).filter((f) => f.endsWith(".ts"));
+    eventFiles.forEach(async (fileName: string, index: number) => {
+      fileName = fileName.split(".")[0];
+      let eventFile: Event = await import(`../${config.eventsDir}/${fileName}`);
+      this.on(eventFile.name, eventFile.run.bind(null, self));
+      this.events.set(eventFile.name, eventFile);
     });
-    
   }
 
   public getColor(message: Message): ColorResolvable {
