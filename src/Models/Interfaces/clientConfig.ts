@@ -5,4 +5,5 @@ export interface clientConfig {
   commandsDir: string;
   eventsDir: string;
   defualtPrefix: string;
+  deleteCmdOnTrigger: boolean;
 }

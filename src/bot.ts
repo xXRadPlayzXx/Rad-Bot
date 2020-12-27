@@ -1,6 +1,11 @@
 import RadClient from "./Structures/RadClient";
+import consola from "consola";
+
 import { config } from "dotenv";
+import { Mongoose } from "mongoose";
+
 config();
+
 const client = new RadClient();
 client.start({
   commandsDir: "Commands",
@@ -8,4 +13,5 @@ client.start({
   eventsDir: "Events",
   owners: ["779358708672102470"],
   defualtPrefix: "r!",
+  deleteCmdOnTrigger: true,
 });

@@ -10,6 +10,8 @@ import {
   GuildMember,
   PermissionResolvable,
   PermissionString,
+  TextChannel,
+  GuildChannel,
 } from "discord.js";
 
 import path from "path";
@@ -22,18 +24,37 @@ import { Command } from "../Models/Interfaces/command";
 import { Event } from "../Models/Interfaces/event";
 import { version } from "../../package.json";
 import { readdirSync } from "fs";
-import { stringify } from "querystring";
+import Logger from "../Models/Interfaces/logger";
+import clientLogger from "../Models/Utils/Logger";
 
 var self: RadClient;
 
 class RadClient extends Client {
-  public embedColor: ColorResolvable;
-  public commands: Collection<string, Command> = new Collection();
-  public aliases: Collection<string, string> = new Collection();
-  public events: Collection<string, Event> = new Collection();
-  public owners: string[];
-  public config: clientConfig;
-  public deleteCmdMessageOnTrigger: boolean;
+  private _commands: Collection<string, Command> = new Collection();
+  private _aliases: Collection<string, string> = new Collection();
+  private _events: Collection<string, Event> = new Collection();
+  private _owners: string[];
+  private _config: clientConfig;
+  private _logger: Logger = new clientLogger();
+
+  public get commands(): Collection<string, Command> {
+    return this._commands;
+  }
+  public get aliases(): Collection<string, string> {
+    return this._aliases;
+  }
+  public get events(): Collection<string, Event> {
+    return this._events;
+  }
+  public get owners(): string[] {
+    return this._owners;
+  }
+  public get config(): clientConfig {
+    return this._config;
+  }
+  public get logger(): Logger {
+    return this._logger;
+  }
 
   public constructor(options?: ClientOptions) {
     super(options);
@@ -42,15 +63,16 @@ class RadClient extends Client {
   public colorText(
     text: string,
     subTitles?: string[] | string,
-    title: string = "Rad Bot"
+    title: string = chalk.magentaBright(`Rad Bot`)
   ) {
-    var baseTitle = `${title} ${chalk.cyan("|")} `;
+    if (title) title = chalk.magentaBright(title);
+    var baseTitle = `${title} ${chalk.cyanBright("|")} `;
     if (typeof subTitles === "string") {
       subTitles = [subTitles];
     }
     if (subTitles) {
       subTitles.forEach((subtitle: string, index: number) => {
-        baseTitle += `${chalk.blue(subtitle)} ${chalk.cyan("|")} `;
+        baseTitle += `${chalk.blue(subtitle)} ${chalk.cyanBright("|")} `;
       });
     }
 
@@ -69,7 +91,7 @@ class RadClient extends Client {
     return toReturn;
   }
   public async start(config: clientConfig): Promise<void> {
-    this.config = config;
+    this._config = config;
     this.login(config.token);
     const commandFiles = readdirSync(
       path.join(__dirname, "..", config.commandsDir)
@@ -109,13 +131,13 @@ class RadClient extends Client {
           )}`
         );
       }
-      self.aliases.set(fileName, commandFile.name);
-      this.commands.set(commandFile.name, commandFile);
+      this._aliases.set(fileName, commandFile.name);
+      this._commands.set(commandFile.name, commandFile);
       if (typeof commandFile.aliases === "string")
         commandFile.aliases = [commandFile.aliases];
       if (commandFile.aliases) {
         commandFile.aliases.forEach((alias: string) => {
-          self.aliases.set(alias, commandFile.name);
+          self._aliases.set(alias, commandFile.name);
         });
       }
     });
@@ -127,21 +149,25 @@ class RadClient extends Client {
       fileName = fileName.split(".")[0];
       let eventFile: Event = await import(`../${config.eventsDir}/${fileName}`);
       this.on(eventFile.name, eventFile.run.bind(null, self));
-      this.events.set(eventFile.name, eventFile);
+      this._events.set(eventFile.name, eventFile);
     });
   }
 
   public getColor(message: Message): ColorResolvable {
     const color =
       message.guild.me.displayHexColor === "#000000"
-        ? "#ff5600"
+        ? "#FF5600"
         : message.guild.me.displayHexColor;
     return color;
   }
 
-  public embed(options: MessageEmbedOptions, message: Message): MessageEmbed {
-    return new MessageEmbed(options)
-      .setColor(this.getColor(message))
+  public embed(
+    options: MessageEmbedOptions,
+    message: Message,
+    error: boolean
+  ): MessageEmbed {
+    const embed: MessageEmbed = new MessageEmbed(options)
+      .setColor(error ? 0xff0000 : 0xff5600)
       .setAuthor(
         message.member.displayName || message.author.username,
         message.author.displayAvatarURL({ dynamic: true, format: "png" })
@@ -150,6 +176,14 @@ class RadClient extends Client {
         `${this.user.username} | ${version}`,
         this.user.displayAvatarURL({ dynamic: true, format: "png" })
       );
+    if (error) {
+      embed.setThumbnail("https://i.imgur.com/IG8G9ZR.png");
+    } else {
+      embed.setThumbnail(
+        this.user.displayAvatarURL({ dynamic: true, format: "png" })
+      );
+    }
+    return embed;
   }
 }
 export = RadClient;

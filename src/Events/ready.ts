@@ -1,14 +1,35 @@
+import { Mongoose } from "mongoose";
+
+import connectToMongo from "../Models/Functions/connectToMongo";
 import RadClient from "../Structures/RadClient";
-import consola from "consola";
 import chalk from "chalk";
 export = {
   name: "ready",
-  run: (bot: RadClient) => {
-    consola.success(bot.colorText(`Successfully logged in as ${bot.user.tag}`));
+  run: async (bot: RadClient) => {
+    var consola = bot.logger;
+    let text = chalk.blue(`
+    ██████╗░░█████╗░██████╗░  ██████╗░░█████╗░████████╗
+    ██╔══██╗██╔══██╗██╔══██╗  ██╔══██╗██╔══██╗╚══██╔══╝
+    ██████╔╝███████║██║░░██║  ██████╦╝██║░░██║░░░██║░░░
+    ██`);
 
+    text += chalk.magenta(`╔══██╗██╔══██║██║░░██║  ██╔══██╗██║░░██║░░░██║░░░
+    ██║░░██║██║░░██║██████╔╝  ██████╦╝╚█████╔╝░░░██║░░░
+    ╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░  ╚═════╝░░╚════╝░░░░╚═╝░░░`);
+    console.log(`${text} \n`);
+
+    consola.success(
+      bot.colorText(`Logged in as ${chalk.greenBright(bot.user.tag)}`),
+      new Date().getTime()
+    );
+    await connectToMongo();
+    consola.success(
+      bot.colorText("Connected to MongoDB", null, "Data Base"),
+      new Date().getTime()
+    );
     consola.info(
       bot.colorText(
-        `Successfully loaded ${chalk.cyanBright(bot.commands.size)} command${
+        `Loaded ${chalk.cyanBright(bot.commands.size)} command${
           bot.commands.size === 1 ? "" : "s"
         }`,
         "Command Handler"
@@ -16,7 +37,7 @@ export = {
     );
     consola.info(
       bot.colorText(
-        `Successfully loaded ${chalk.cyanBright(bot.events.size)} event${
+        `Loaded ${chalk.cyanBright(bot.events.size)} event${
           bot.events.size === 1 ? "" : "s"
         }`,
         "Event Handler"

@@ -11,4 +11,7 @@ export interface Command {
   _callback: cmdRunFn;
   guildOwnerOnly?: boolean;
   reqPerms?: Array<PermissionResolvable>;
+  minArgs: number;
+  maxArgs: number;
+  syntax: string;
 }

@@ -13,7 +13,8 @@ export = {
         {
           title: "Pinging...",
         },
-        message
+        message,
+        false
       )
     );
     setTimeout(() => {
@@ -36,12 +37,13 @@ export = {
               },
               {
                 name: "UPTime:",
-                value: `\`\`${ms(bot.uptime, { long: true })}\`\``,
+                value: `\`\`${ms(bot.uptime, { long: false })}\`\``,
                 inline: true,
               },
             ],
           },
-          message
+          message,
+          false
         )
       );
     }, 750);
