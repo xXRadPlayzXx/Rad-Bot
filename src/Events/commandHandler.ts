@@ -101,8 +101,9 @@ export = {
       message.delete();
     }
 
-    if (command.reqPerms.length) {
+    if (command.reqPerms?.length) {
       const result = await havePerms(command.reqPerms, message, self);
+      let ifReturn: boolean;
       if (result === false) {
         const permErrEmbed: MessageEmbed = self.embed(
           {
@@ -114,10 +115,12 @@ export = {
           message,
           true
         );
-        return message.channel
+         message.channel
           .send(permErrEmbed)
           .then((m) => m.delete({ timeout: 5000 }));
+          ifReturn = true
       }
+      if (ifReturn === true) return;
     }
     if (
       (command.minArgs && args.length < command.minArgs) ||

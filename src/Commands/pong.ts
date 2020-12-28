@@ -6,7 +6,7 @@ export = {
   aliases: ["latency", "uptime", "botuptime", "raduptime"],
   description: "Ping => Pong",
   category: "Info",
-  reqPerms: ["MANAGE_MESSAGES"],
+  reqPerms: [],
   callback: async (message: Message, args: string[], bot: RadClient) => {
     const msg = await message.reply(
       bot.embed(
