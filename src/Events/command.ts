@@ -145,9 +145,9 @@ export = {
     // Check if the user has a cooldown
     if (self.cooldowns.has(`${message.author.id}-${command.name}`)) {
       const coolDowntoWait = ms(
-        ms(ms(new Date().getTime())) - ms(self.cooldowns.get(
-        `${message.author.id}-${command.name}`)
-      ) );
+        ms(ms(new Date().getTime())) -
+          ms(self.cooldowns.get(`${message.author.id}-${command.name}`))
+      );
       return message.channel.send(
         self.embed(
           {

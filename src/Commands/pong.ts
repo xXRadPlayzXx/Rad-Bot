@@ -8,7 +8,7 @@ export = {
   category: "Info",
   reqPerms: [],
   maxArgs: 0,
-  cooldown: '1m',
+  cooldown: "1m",
   callback: async (message: Message, args: string[], bot: RadClient) => {
     const msg = await message.reply(
       bot.embed(

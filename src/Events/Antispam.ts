@@ -46,7 +46,7 @@ export = {
 
       const difference =
         message.createdTimestamp - lastMessage.createdTimestamp;
-      
+
       if (difference > DIFF) {
         clearTimeout(timer);
         usersData.lastMessage = message;

@@ -208,7 +208,7 @@ class RadClient extends Client {
       this._aliases.set(fileName, commandFile.name);
       this._commands.set(commandFile.name, {
         cooldown: "3s",
-        ...commandFile
+        ...commandFile,
       });
       if (typeof commandFile.aliases === "string")
         commandFile.aliases = [commandFile.aliases];
@@ -237,7 +237,7 @@ class RadClient extends Client {
         : message.guild.me.displayHexColor;
     return color;
   }
-   /** Returns an embed! */
+  /** Returns an embed! */
   public embed(
     options: MessageEmbedOptions,
     message: Message,

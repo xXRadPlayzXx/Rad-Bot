@@ -4,7 +4,7 @@
   "description": "",
   "main": "bot.ts",
   "scripts": {
-    "dev": "tsnd --respawn --rs --clear src/bot.ts",
+    "dev": "cls && tsnd --respawn --rs --clear src/bot.ts",
     "start": "cls && ts-node src/bot.ts",
     "build": "tsc && npm run format",
     "install": "cls",
