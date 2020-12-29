@@ -7,7 +7,7 @@ import {
   PermissionString,
 } from "discord.js";
 import consola from "consola";
-import RadClient from "../../Structures/RadClient";
+import RadClient from "../Structures/RadClient";
 const validatePermissions = async (
   permissions: Array<PermissionResolvable>
 ): Promise<void> => {

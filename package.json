@@ -4,8 +4,9 @@
   "description": "",
   "main": "bot.ts",
   "scripts": {
-    "start": "cls && nodemon src/bot.ts",
-    "build": "cls && tsc",
+    "dev": "tsnd --respawn --rs --clear src/bot.ts",
+    "start": "cls && ts-node src/bot.ts",
+    "build": "tsc && npm run format",
     "install": "cls",
     "format": "cls && npx prettier --write .",
     "restart": "npm run build && npm run format && npm start"
@@ -14,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^14.14.14",
+    "badwords-list": "^1.0.0",
     "chalk": "^4.1.0",
     "colors": "^1.4.0",
     "consola": "^2.15.0",
@@ -27,5 +29,8 @@
     "prompts": "^2.4.0",
     "readdir-plus": "^1.1.1",
     "typescript": "^4.1.3"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.1.1"
   }
 }

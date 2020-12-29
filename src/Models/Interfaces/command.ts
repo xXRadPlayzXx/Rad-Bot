@@ -1,5 +1,5 @@
 import { PermissionResolvable } from "discord.js";
-import { cmdRunFn } from "../Functions/cmdRunFn";
+import { cmdRunFn } from "../../Functions/cmdRunFn";
 
 type category = "Moderation" | "Dev" | "Economy" | "Fun";
 
@@ -11,7 +11,8 @@ export interface Command {
   _callback: cmdRunFn;
   guildOwnerOnly?: boolean;
   reqPerms?: Array<PermissionResolvable>;
-  minArgs: number;
-  maxArgs: number;
-  syntax: string;
+  minArgs?: number;
+  maxArgs?: number;
+  syntax?: string;
+  cooldown: string;
 }

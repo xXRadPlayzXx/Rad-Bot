@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My First OAuth2 App</title>
+  </head>
+  <body>
+    <link rel="stylesheet" href="styles.css" />
+
+    <div id="info">Hoi!</div>
+    <a
+      id="login"
+      style="display: none"
+      href="https://discord.com/api/oauth2/authorize?client_id=779417677575880784&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code&scope=identify"
+      >Test</a
+    >
+    <button class="button">a simple button</button>
+    <script type="module">
+      window.onload = () => {
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+
+        if (fragment.has("access_token")) {
+          const accessToken = fragment.get("access_token");
+          const tokenType = fragment.get("token_type");
+
+          fetch("https://discord.com/api/users/@me", {
+            headers: {
+              authorization: `${tokenType} ${accessToken}`,
+            },
+          })
+            .then((res) => res.json())
+            .then((response) => {
+              const { username, discriminator } = response;
+              document.getElementById(
+                "info"
+              ).innerText += ` ${username}#${discriminator}`;
+            })
+            .catch(console.error);
+        } else {
+          document.getElementById("login").style.display = "block";
+        }
+      };
+    </script>
+  </body>
+</html>

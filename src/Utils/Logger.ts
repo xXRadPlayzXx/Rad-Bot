@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import symbols from "log-symbols";
-import Logger from "../Interfaces/logger";
+import Logger from "../Models/Interfaces/logger";
 
 export class clientLogger implements Logger {
   private static instance: clientLogger;

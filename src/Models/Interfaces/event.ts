@@ -1,4 +1,4 @@
-import { eventRunFn } from "../Functions/eventRunFn";
+import { eventRunFn } from "../../Functions/eventRunFn";
 
 export interface Event {
   name: string;

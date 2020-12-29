@@ -1,6 +1,6 @@
 import { Mongoose } from "mongoose";
 
-import connectToMongo from "../Models/Functions/connectToMongo";
+import connectToMongo from "../Functions/connectToMongo";
 import RadClient from "../Structures/RadClient";
 import chalk from "chalk";
 export = {

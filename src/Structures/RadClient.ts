@@ -12,20 +12,22 @@ import {
   PermissionString,
   TextChannel,
   GuildChannel,
+  Guild,
+  Role,
 } from "discord.js";
 
 import path from "path";
-import Discord from "discord.js";
 import consola from "consola";
 import chalk from "chalk";
+import ms from "ms";
+import Logger from "../Models/Interfaces/logger";
+import clientLogger from "../Utils/Logger";
 
 import { clientConfig } from "../Models/Interfaces/clientConfig";
 import { Command } from "../Models/Interfaces/command";
 import { Event } from "../Models/Interfaces/event";
 import { version } from "../../package.json";
 import { readdirSync } from "fs";
-import Logger from "../Models/Interfaces/logger";
-import clientLogger from "../Models/Utils/Logger";
 
 var self: RadClient;
 
@@ -34,11 +36,15 @@ class RadClient extends Client {
   private _aliases: Collection<string, string> = new Collection();
   private _events: Collection<string, Event> = new Collection();
   private _owners: string[];
+  private _cooldowns: Collection<string, string> = new Collection();
   private _config: clientConfig;
   private _logger: Logger = new clientLogger();
 
   public get commands(): Collection<string, Command> {
     return this._commands;
+  }
+  public get cooldowns(): Collection<string, string> {
+    return this._cooldowns;
   }
   public get aliases(): Collection<string, string> {
     return this._aliases;
@@ -60,6 +66,7 @@ class RadClient extends Client {
     super(options);
     self = this;
   }
+  /** From a normal white text to a colorful and style-ish text! */
   public colorText(
     text: string,
     subTitles?: string[] | string,
@@ -78,6 +85,72 @@ class RadClient extends Client {
 
     return `${baseTitle}${text}`;
   }
+  /** Mutes a member ! */
+  public async moderationMute(
+    member: GuildMember,
+    message: Message,
+    guild: Guild,
+    reason: string = "The mute hammer has spoken!",
+    time?: string | number
+  ): Promise<void> {
+    // If the time is in ms
+    if (typeof time === "number") {
+      time = ms(ms(time)); // the time will be in a string example: 6h2m3s5ms
+    }
+    let mutedRole: Role = (await guild.roles.fetch()).cache.find(
+      (r) => r.name.toLowerCase() === "Muted".toLowerCase()
+    );
+    if (!mutedRole) {
+      this.logger.warning(
+        this.colorText("No Muted role found, creating a new one.", [
+          "Moderation",
+        ])
+      );
+      mutedRole = await guild.roles.create({
+        data: {
+          name: "Muted",
+          color: `#000000`,
+          permissions: [],
+        },
+        reason: `This server did not have a muted role so i made one!`,
+      });
+      guild.channels.cache.forEach(async (ch) => {
+        await ch.createOverwrite(mutedRole, {
+          SEND_MESSAGES: false,
+          ADD_REACTIONS: false,
+        });
+      });
+    }
+    member.send(
+      this.embed(
+        {
+          title: `The mute hammer has spoken!`,
+          description: `You have been muted in **\`\`${message.guild.name}\`\`**`,
+          fields: [
+            {
+              name: "Time:",
+              value: time || "For ever",
+              inline: false,
+            },
+            {
+              name: "Reason:",
+              value: reason,
+              inline: false,
+            },
+          ],
+        },
+        message,
+        false
+      )
+    );
+    await member.roles.add(mutedRole);
+    if (time) {
+      setTimeout(async () => {
+        await member.roles.remove(mutedRole);
+      }, ms(time));
+    }
+  }
+  /** Checks if a user is a bot owner */
   public async isOwner(ids: string[], message: Message): Promise<boolean> {
     let toReturn: boolean;
     ids.forEach((id: string, index: number) => {
@@ -90,6 +163,7 @@ class RadClient extends Client {
     });
     return toReturn;
   }
+  /** Starts the bot! */
   public async start(config: clientConfig): Promise<void> {
     this._config = config;
     this.login(config.token);
@@ -132,7 +206,10 @@ class RadClient extends Client {
         );
       }
       this._aliases.set(fileName, commandFile.name);
-      this._commands.set(commandFile.name, commandFile);
+      this._commands.set(commandFile.name, {
+        cooldown: "3s",
+        ...commandFile
+      });
       if (typeof commandFile.aliases === "string")
         commandFile.aliases = [commandFile.aliases];
       if (commandFile.aliases) {
@@ -160,7 +237,7 @@ class RadClient extends Client {
         : message.guild.me.displayHexColor;
     return color;
   }
-
+   /** Returns an embed! */
   public embed(
     options: MessageEmbedOptions,
     message: Message,

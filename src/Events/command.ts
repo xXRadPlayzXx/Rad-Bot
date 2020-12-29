@@ -1,7 +1,8 @@
 import RadClient from "../Structures/RadClient";
 import { Command } from "../Models/Interfaces/command";
 import { Message, MessageEmbed } from "discord.js";
-import havePerms from "../Models/Functions/havePerms";
+import havePerms from "../Functions/havePerms";
+import ms from "ms";
 export = {
   name: "message",
   run: async (self: RadClient, message: Message) => {
@@ -100,7 +101,7 @@ export = {
     if (self.config.deleteCmdOnTrigger === true) {
       message.delete();
     }
-
+    // Insure the user has the required permissions
     if (command.reqPerms?.length) {
       const result = await havePerms(command.reqPerms, message, self);
       let ifReturn: boolean;
@@ -115,19 +116,20 @@ export = {
           message,
           true
         );
-         message.channel
+        message.channel
           .send(permErrEmbed)
           .then((m) => m.delete({ timeout: 5000 }));
-          ifReturn = true
+        ifReturn = true;
       }
       if (ifReturn === true) return;
     }
+    // Insure the user is running the command with the correct syntax
     if (
       (command.minArgs && args.length < command.minArgs) ||
       (command.maxArgs !== null && args.length > command.maxArgs)
     ) {
       message.delete();
-      message.channel.send(
+      return message.channel.send(
         self.embed(
           {
             title: `Incorrect Usage! | ${self.user.username}`,
@@ -140,6 +142,24 @@ export = {
         )
       );
     }
+    // Check if the user has a cooldown
+    if (self.cooldowns.has(`${message.author.id}-${command.name}`)) {
+      const coolDowntoWait = ms(
+        ms(ms(new Date().getTime())) - ms(self.cooldowns.get(
+        `${message.author.id}-${command.name}`)
+      ) );
+      return message.channel.send(
+        self.embed(
+          {
+            title: `Access Denied | ${self.user.username}`,
+            description: `You must wait ${coolDowntoWait} before running this command again.`,
+          },
+          message,
+          true
+        )
+      );
+    }
+
     await command._callback(message, args, self).catch((err: Error) => {
       self.config.deleteCmdOnTrigger ? message.delete() : "";
 
@@ -156,5 +176,10 @@ export = {
         .then((m) => m.delete({ timeout: 5000 }));
       consola.error(`${err.name} | ${err.message}`);
     });
+    if (command.cooldown)
+      self.cooldowns.set(
+        `${message.author.id}-${command.name}`,
+        command.cooldown
+      );
   },
 };
