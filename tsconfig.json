@@ -13,6 +13,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "src/Commands/ping.js"],
+  "include": ["src/**/*.ts", "src/Commands/ping.js", "src/tst.js"],
   "exclude": ["src/**/*.spec.ts", "node_modules"]
 }

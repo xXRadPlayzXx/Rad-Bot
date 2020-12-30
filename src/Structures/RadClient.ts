@@ -15,7 +15,6 @@ import {
   Guild,
   Role,
 } from "discord.js";
-
 import path from "path";
 import consola from "consola";
 import chalk from "chalk";
@@ -23,7 +22,7 @@ import ms from "ms";
 import Logger from "../Models/Interfaces/logger";
 import clientLogger from "../Utils/Logger";
 
-import { clientConfig } from "../Models/Interfaces/clientConfig";
+import clientConfig  from "../Models/Interfaces/clientConfig";
 import { Command } from "../Models/Interfaces/command";
 import { Event } from "../Models/Interfaces/event";
 import { version } from "../../package.json";

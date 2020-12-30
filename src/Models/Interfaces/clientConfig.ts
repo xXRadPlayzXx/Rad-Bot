@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-export interface clientConfig {
+export default interface clientConfig {
   owners?: string[];
   token: string;
   commandsDir: string;
